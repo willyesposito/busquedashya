@@ -28,6 +28,14 @@
   .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
   .meta-grid input { padding: 9px 10px; }
 
+  .field-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
+  .field-row label { flex: 1; min-width: 60px; }
+  .clear-field {
+    cursor: pointer; color: #B0A8A2; font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+    flex-shrink: 0; white-space: nowrap; padding-top: 1px;
+  }
+  .clear-field:hover { color: #E85518; }
+
   .btn-pill-outline {
     flex: 1; text-align: center; cursor: pointer; border: 2px solid #00ACD4; color: #00ACD4;
     border-radius: 9999px; padding: 8px 14px; font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
@@ -41,6 +49,11 @@
     border-radius: 9999px; padding: 9px 20px; font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
     font-family: 'Source Sans Pro', Arial, sans-serif;
   }
+  .btn-pill-danger {
+    text-align: center; cursor: pointer; border: 1px solid #F3D0C2; color: #E85518; background: #FFF5F0;
+    border-radius: 9999px; padding: 8px 14px; font-size: 12px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .btn-pill-danger:hover { border-color: #E85518; background: #FFEDE5; }
 
   #import-panel {
     display: none; flex-direction: column; gap: 10px; background: #F4F7FA;
@@ -108,6 +121,8 @@
       <div id="reset-btn" class="btn-pill-ghost">Cargar ejemplo</div>
     </div>
 
+    <div id="clear-all-btn" class="btn-pill-danger">Borrar todo el formulario</div>
+
     <div id="import-panel">
       <div style="font-size:12px; font-weight:600; color:#1E3A5F; line-height:1.4;">Pegá el texto completo de la búsqueda y se completan los campos automáticamente. Después podés ajustar lo que haga falta.</div>
       <textarea id="import-text" rows="9" placeholder="Pegá acá el texto de la publicación…" style="background:#FFFFFF;"></textarea>
@@ -117,57 +132,90 @@
     <div style="height:1px; background:#DDE5EF;"></div>
 
     <div class="field">
-      <label>Cápsula superior</label>
+      <div class="field-row">
+        <label>Cápsula superior</label>
+        <span class="clear-field" data-clear="capsule">Borrar</span>
+      </div>
       <input data-field="capsule" placeholder="Buscamos para nuestro cliente">
     </div>
 
     <div class="field">
-      <label>Título del puesto</label>
+      <div class="field-row">
+        <label>Título del puesto</label>
+        <span class="clear-field" data-clear="title">Borrar</span>
+      </div>
       <input data-field="title" placeholder="Analista de Recursos Humanos">
     </div>
 
     <div class="field">
-      <label>Subtítulo <span class="hint">(solo layout B — opcional)</span></label>
+      <div class="field-row">
+        <label>Subtítulo <span class="hint">(solo layout B — opcional)</span></label>
+        <span class="clear-field" data-clear="subtitle">Borrar</span>
+      </div>
       <input data-field="subtitle" placeholder="Selección · Hidalgo &amp; Asociados">
     </div>
 
     <div class="meta-grid">
       <div class="field">
-        <label>Ubicación</label>
+        <div class="field-row">
+          <label>Ubicación</label>
+          <span class="clear-field" data-clear="metaU">Borrar</span>
+        </div>
         <input data-field="metaU" placeholder="Buenos Aires">
       </div>
       <div class="field">
-        <label>Horario</label>
+        <div class="field-row">
+          <label>Horario</label>
+          <span class="clear-field" data-clear="metaH">Borrar</span>
+        </div>
         <input data-field="metaH" placeholder="Horario central">
       </div>
       <div class="field">
-        <label>Esquema</label>
+        <div class="field-row">
+          <label>Esquema</label>
+          <span class="clear-field" data-clear="metaE">Borrar</span>
+        </div>
         <input data-field="metaE" placeholder="Presencial">
       </div>
     </div>
 
     <div class="field">
-      <label>Título de la primera sección</label>
+      <div class="field-row">
+        <label>Título de la primera sección</label>
+        <span class="clear-field" data-clear="respTitle">Borrar</span>
+      </div>
       <input data-field="respTitle" placeholder="Principales responsabilidades">
     </div>
 
     <div class="field">
-      <label>Responsabilidades <span class="hint">(una por línea — "Etiqueta: detalle" pone la etiqueta en negrita)</span></label>
+      <div class="field-row">
+        <label>Responsabilidades <span class="hint">(una por línea — "Etiqueta: detalle" pone la etiqueta en negrita)</span></label>
+        <span class="clear-field" data-clear="respText">Borrar</span>
+      </div>
       <textarea data-field="respText" rows="8" placeholder="Administración de personal: supervisar novedades y legajos.&#10;Cultura y organización: iniciativas de clima laboral."></textarea>
     </div>
 
     <div class="field">
-      <label>Título de la segunda sección</label>
+      <div class="field-row">
+        <label>Título de la segunda sección</label>
+        <span class="clear-field" data-clear="reqTitle">Borrar</span>
+      </div>
       <input data-field="reqTitle" placeholder="Requisitos">
     </div>
 
     <div class="field">
-      <label>Requisitos <span class="hint">(uno por línea, mismo formato)</span></label>
+      <div class="field-row">
+        <label>Requisitos <span class="hint">(uno por línea, mismo formato)</span></label>
+        <span class="clear-field" data-clear="reqText">Borrar</span>
+      </div>
       <textarea data-field="reqText" rows="5" placeholder="Formación: graduados de RRHH o afines&#10;Idioma: Inglés Upper Intermediate"></textarea>
     </div>
 
     <div class="field">
-      <label>Email de postulación</label>
+      <div class="field-row">
+        <label>Email de postulación</label>
+        <span class="clear-field" data-clear="email">Borrar</span>
+      </div>
       <input data-field="email" placeholder="ha5272@bhidalgo.com.ar">
     </div>
 
@@ -226,6 +274,8 @@
     email: 'ha5272@bhidalgo.com.ar'
   };
 
+  var FIELD_KEYS = ['capsule','title','subtitle','metaU','metaH','metaE','respTitle','respText','reqTitle','reqText','email'];
+
   var state = {};
 
   function loadState() {
@@ -242,10 +292,8 @@
 
   function saveState() {
     try {
-      var keep = {};
-      ['layout','capsule','title','subtitle','metaU','metaH','metaE','respTitle','respText','reqTitle','reqText','email'].forEach(function (k) {
-        keep[k] = state[k];
-      });
+      var keep = { layout: state.layout };
+      FIELD_KEYS.forEach(function (k) { keep[k] = state[k]; });
       localStorage.setItem(LS_KEY, JSON.stringify(keep));
     } catch (e) {}
   }
@@ -565,6 +613,26 @@
 
   resetBtn.addEventListener('click', function () {
     Object.assign(state, DEFAULTS);
+    syncFormFromState();
+    saveState();
+    autoFit();
+  });
+
+  document.querySelectorAll('.clear-field').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var f = btn.dataset.clear;
+      state[f] = '';
+      var el = document.querySelector('[data-field="' + f + '"]');
+      if (el) el.value = '';
+      saveState();
+      autoFit();
+    });
+  });
+
+  var clearAllBtn = document.getElementById('clear-all-btn');
+  clearAllBtn.addEventListener('click', function () {
+    if (!window.confirm('¿Borrar todos los campos del formulario? Esta acción no se puede deshacer.')) return;
+    FIELD_KEYS.forEach(function (f) { state[f] = ''; });
     syncFormFromState();
     saveState();
     autoFit();
