@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de placas · Hidalgo & Asociados</title>
+<link rel="stylesheet" href="_ds/colors_and_type.css">
+<style>
+  html, body { height: 100%; }
+  body { overflow: hidden; }
+
+  .app { display: flex; height: 100vh; overflow: hidden; background: #F4F7FA; }
+
+  .panel-left {
+    width: 410px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #DDE5EF;
+    overflow-y: auto; padding: 28px 26px 40px 26px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: 12px; font-weight: 600; color: #1E3A5F; }
+  .field label .hint { font-weight: 400; color: #8FA3BA; }
+  .field input, .field textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid #DDE5EF; border-radius: 8px;
+    font-size: 13px; color: #1E3A5F; font-family: 'Source Sans Pro', Arial, sans-serif;
+  }
+  .field textarea { resize: vertical; line-height: 1.5; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .meta-grid input { padding: 9px 10px; }
+
+  .btn-pill-outline {
+    flex: 1; text-align: center; cursor: pointer; border: 2px solid #00ACD4; color: #00ACD4;
+    border-radius: 9999px; padding: 8px 14px; font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .btn-pill-ghost {
+    flex: 1; text-align: center; cursor: pointer; border: 1px solid #DDE5EF; color: #8C837B;
+    border-radius: 9999px; padding: 9px 14px; font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+  }
+  .btn-pill-solid {
+    cursor: pointer; text-align: center; background: #00ACD4; color: #FFFFFF; border: none;
+    border-radius: 9999px; padding: 9px 20px; font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+  }
+
+  #import-panel {
+    display: none; flex-direction: column; gap: 10px; background: #F4F7FA;
+    border: 1px solid #DDE5EF; border-radius: 14px; padding: 14px;
+  }
+  #import-panel.open { display: flex; }
+
+  .panel-right { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  .toolbar {
+    display: flex; align-items: center; justify-content: space-between; padding: 18px 28px;
+    border-bottom: 1px solid #DDE5EF; background: #FFFFFF; flex-shrink: 0;
+  }
+  .toolbar-left { display: flex; gap: 8px; align-items: center; }
+  .toolbar-label {
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em;
+    color: #00ACD4; margin-right: 8px;
+  }
+  .tab {
+    cursor: pointer; border-radius: 9999px; padding: 8px 18px; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.02em; background: transparent; color: #8C837B; border: 2px solid #DDE5EF;
+    transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  }
+  .tab.active { background: #00ACD4; color: #FFFFFF; border-color: #00ACD4; }
+
+  #download-btn {
+    cursor: pointer; background: #00ACD4; color: #FFFFFF; border: none; border-radius: 9999px;
+    padding: 10px 26px; font-size: 14px; font-weight: 600; letter-spacing: 0.02em;
+    font-family: 'Source Sans Pro', Arial, sans-serif;
+  }
+  #download-btn[disabled] { opacity: 0.7; cursor: default; }
+
+  .preview-area { flex: 1; overflow: auto; display: flex; align-items: flex-start; justify-content: center; padding: 32px; }
+  .preview-scaler { flex-shrink: 0; }
+
+  #export-node {
+    width: 1200px; height: 1200px; background: #FFFFFF; overflow: hidden;
+    font-family: 'Source Sans Pro', Arial, sans-serif; box-shadow: 0 12px 40px rgba(30,58,95,0.15);
+    display: flex; flex-direction: column; transform-origin: top left;
+  }
+
+  a.back-link { font-size: 12px; color: #8C837B; text-decoration: none; }
+  a.back-link:hover { color: #00ACD4; }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ══════════ PANEL DE CARGA ══════════ -->
+  <div class="panel-left">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <img src="assets/logo-consultora.png" alt="H&amp;A" style="width:44px; height:44px;">
+      <div>
+        <div style="font-size:17px; font-weight:700; color:#1E3A5F;">Generador de placas</div>
+        <div style="font-size:12px; color:#8C837B;">Búsquedas laborales · LinkedIn</div>
+      </div>
+    </div>
+
+    <div style="background:#FFF8E1; border-left:4px solid #00ACD4; padding:10px 14px; font-size:12px; color:#5D4037; line-height:1.45;">
+      <strong style="color:#00ACD4;">Aviso de privacidad:</strong> no cargues datos personales de candidatos, empleados o clientes en esta herramienta.
+    </div>
+
+    <div style="display:flex; gap:8px;">
+      <div id="import-toggle-btn" class="btn-pill-outline">Importar desde texto</div>
+      <div id="reset-btn" class="btn-pill-ghost">Cargar ejemplo</div>
+    </div>
+
+    <div id="import-panel">
+      <div style="font-size:12px; font-weight:600; color:#1E3A5F; line-height:1.4;">Pegá el texto completo de la búsqueda y se completan los campos automáticamente. Después podés ajustar lo que haga falta.</div>
+      <textarea id="import-text" rows="9" placeholder="Pegá acá el texto de la publicación…" style="background:#FFFFFF;"></textarea>
+      <div id="import-parse-btn" class="btn-pill-solid">Completar campos</div>
+    </div>
+
+    <div style="height:1px; background:#DDE5EF;"></div>
+
+    <div class="field">
+      <label>Cápsula superior</label>
+      <input data-field="capsule" placeholder="Buscamos para nuestro cliente">
+    </div>
+
+    <div class="field">
+      <label>Título del puesto</label>
+      <input data-field="title" placeholder="Analista de Recursos Humanos">
+    </div>
+
+    <div class="field">
+      <label>Subtítulo <span class="hint">(solo layout B — opcional)</span></label>
+      <input data-field="subtitle" placeholder="Selección · Hidalgo &amp; Asociados">
+    </div>
+
+    <div class="meta-grid">
+      <div class="field">
+        <label>Ubicación</label>
+        <input data-field="metaU" placeholder="Buenos Aires">
+      </div>
+      <div class="field">
+        <label>Horario</label>
+        <input data-field="metaH" placeholder="Horario central">
+      </div>
+      <div class="field">
+        <label>Esquema</label>
+        <input data-field="metaE" placeholder="Presencial">
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Título de la primera sección</label>
+      <input data-field="respTitle" placeholder="Principales responsabilidades">
+    </div>
+
+    <div class="field">
+      <label>Responsabilidades <span class="hint">(una por línea — "Etiqueta: detalle" pone la etiqueta en negrita)</span></label>
+      <textarea data-field="respText" rows="8" placeholder="Administración de personal: supervisar novedades y legajos.&#10;Cultura y organización: iniciativas de clima laboral."></textarea>
+    </div>
+
+    <div class="field">
+      <label>Título de la segunda sección</label>
+      <input data-field="reqTitle" placeholder="Requisitos">
+    </div>
+
+    <div class="field">
+      <label>Requisitos <span class="hint">(uno por línea, mismo formato)</span></label>
+      <textarea data-field="reqText" rows="5" placeholder="Formación: graduados de RRHH o afines&#10;Idioma: Inglés Upper Intermediate"></textarea>
+    </div>
+
+    <div class="field">
+      <label>Email de postulación</label>
+      <input data-field="email" placeholder="ha5272@bhidalgo.com.ar">
+    </div>
+
+    <a class="back-link" href="index.html">&larr; Volver al índice</a>
+  </div>
+
+  <!-- ══════════ VISTA PREVIA ══════════ -->
+  <div class="panel-right">
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="toolbar-label">Layout</div>
+        <div class="tab" data-layout="a">A · Clásica</div>
+        <div class="tab" data-layout="b">B · Panel lateral</div>
+        <div class="tab" data-layout="c">C · Hero celeste</div>
+      </div>
+      <button id="download-btn" type="button">Descargar PNG</button>
+    </div>
+
+    <div class="preview-area">
+      <div class="preview-scaler" id="scaler">
+        <div id="export-node" data-screen-label="Placa"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var LS_KEY = 'hya-generador-placas';
+
+  var DEFAULTS = {
+    layout: 'a',
+    capsule: 'Buscamos para nuestro cliente',
+    title: 'Analista de Recursos Humanos',
+    subtitle: 'Selección · Hidalgo & Asociados',
+    metaU: 'Buenos Aires',
+    metaH: 'Horario central',
+    metaE: 'Esquema presencial',
+    respTitle: 'Principales responsabilidades',
+    respText: [
+      'Administración de personal: supervisar el cumplimiento de novedades, control de legajos y procesos administrativos de ingreso/egreso.',
+      'Tareas generalistas: brindar soporte al área en general y atención como perfil generalista a determinadas unidades de negocio.',
+      'Cultura y organización: participar en el diseño de iniciativas que fortalezcan el clima laboral y la alineación con los valores organizacionales.',
+      'Marca empleadora: ejecutar acciones para potenciar el posicionamiento de la compañía en el mercado de talento y redes profesionales.',
+      'Gestión del talento: soporte en procesos de capacitación, desempeño y comunicación interna.'
+    ].join('\n'),
+    reqTitle: 'Requisitos',
+    reqText: [
+      'Formación: graduados o próximos a graduarse de Recursos Humanos, Relaciones del Trabajo, Psicología o carreras afines',
+      'Idioma: Inglés Upper Intermediate',
+      'Experiencia: mínima de 2 a 3 años en posiciones similares'
+    ].join('\n'),
+    email: 'ha5272@bhidalgo.com.ar'
+  };
+
+  var state = {};
+
+  function loadState() {
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+    state = Object.assign({}, DEFAULTS, saved || {}, {
+      fitPx: 24,
+      previewScale: 0.5,
+      importOpen: false,
+      importText: '',
+      exporting: false
+    });
+  }
+
+  function saveState() {
+    try {
+      var keep = {};
+      ['layout','capsule','title','subtitle','metaU','metaH','metaE','respTitle','respText','reqTitle','reqText','email'].forEach(function (k) {
+        keep[k] = state[k];
+      });
+      localStorage.setItem(LS_KEY, JSON.stringify(keep));
+    } catch (e) {}
+  }
+
+  function esc(str) {
+    return String(str == null ? '' : str)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function parseItems(txt) {
+    return (txt || '').split('\n').map(function (l) { return l.trim(); }).filter(Boolean).map(function (l) {
+      var i = l.indexOf(':');
+      if (i > 0 && i < 60) return { label: l.slice(0, i + 1) + ' ', text: l.slice(i + 1).trim() };
+      return { label: '', text: l };
+    });
+  }
+
+  function doImport(text) {
+    var upd = {};
+    var emailMatch = text.match(/[\w.+-]+@[\w.-]+\.\w+/);
+    if (emailMatch) upd.email = emailMatch[0];
+
+    var lines = text.split(/\n/)
+      .map(function (l) { return l.replace(/^[\s•\-–—▪✅☑️🔹🚀📍*·]+/, '').trim(); })
+      .filter(Boolean);
+    if (!lines.length) return upd;
+
+    var isHeader = function (l, re) { return re.test(l) && l.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑüÜ ¿?]/g, '').length < 45; };
+    var idxResp = lines.findIndex(function (l) { return isHeader(l, /respons|tareas|¿?cu[aá]les ser[aá]n/i); });
+    var idxReq = lines.findIndex(function (l) { return isHeader(l, /requisit|valoramos|buscamos en vos|perfil buscado/i); });
+    var idxDatos = lines.findIndex(function (l) { return isHeader(l, /datos de inter|inter[eé]s|informaci[oó]n/i); });
+
+    var first = lines.find(function (l) { return !/postulate|cv|@/i.test(l); });
+    if (first) {
+      upd.title = first.replace(/^b[uú]squeda laboral:?\s*/i, '').replace(/^b[uú]squeda:?\s*/i, '').trim();
+    }
+
+    lines.forEach(function (l) {
+      var val = l.includes(':') ? l.split(':').slice(1).join(':').trim() : l;
+      if (/ubicaci[oó]n|microcentro|zona/i.test(l) && !upd.metaU) upd.metaU = val || l;
+      else if (/horario|lunes a viernes/i.test(l) && !upd.metaH) upd.metaH = l.replace(/^.*horario:?\s*/i, '') || val;
+      else if (/esquema|h[ií]brido|remoto|presencial/i.test(l) && !upd.metaE) upd.metaE = val || l;
+    });
+
+    var sectionEnd = function (start) {
+      var ends = [idxResp, idxReq, idxDatos].filter(function (i) { return i > start; });
+      return ends.length ? Math.min.apply(null, ends) : lines.length;
+    };
+    var cleanBody = function (arr) {
+      return arr.filter(function (l) {
+        return !/postulate|enviando tu cv|@/i.test(l) && !/^ubicaci[oó]n|^horario|^esquema/i.test(l);
+      });
+    };
+
+    if (idxResp >= 0) {
+      upd.respText = cleanBody(lines.slice(idxResp + 1, sectionEnd(idxResp))).join('\n');
+      var h1 = lines[idxResp].replace(/[:¿?]/g, '').trim();
+      if (h1) upd.respTitle = h1;
+    }
+    if (idxReq >= 0) {
+      upd.reqText = cleanBody(lines.slice(idxReq + 1, sectionEnd(idxReq))).join('\n');
+      var h2 = lines[idxReq].replace(/[:¿?]/g, '').trim();
+      if (h2) upd.reqTitle = h2;
+    }
+    return upd;
+  }
+
+  function computeVals() {
+    var s = state;
+    var title = s.title || 'Título del puesto';
+    var len = title.length;
+    var titleFs = len <= 22 ? 66 : len <= 34 ? 56 : len <= 48 ? 48 : 40;
+    var titleFsB = len <= 26 ? 56 : len <= 40 ? 47 : len <= 56 ? 40 : 34;
+    var email = s.email || 'email@bhidalgo.com.ar';
+    var emailFs = email.length > 28 ? 21 : email.length > 23 ? 24 : 27;
+    var emailFsB = email.length > 24 ? 16 : 20;
+
+    var metas = [s.metaU, s.metaH, s.metaE].map(function (m) { return (m || '').trim(); }).filter(Boolean);
+    var metaLabels = ['Ubicación', 'Horario', 'Esquema'];
+    var metasB = [s.metaU, s.metaH, s.metaE]
+      .map(function (v, i) { return { label: metaLabels[i], value: (v || '').trim() }; })
+      .filter(function (m) { return m.value; });
+
+    return {
+      capsule: s.capsule || 'Búsqueda laboral',
+      title: title, subtitle: s.subtitle,
+      hasSubtitle: !!(s.subtitle && s.subtitle.trim()),
+      respTitle: s.respTitle || 'Responsabilidades',
+      reqTitle: s.reqTitle || 'Requisitos',
+      email: email,
+      respItems: parseItems(s.respText),
+      reqItems: parseItems(s.reqText),
+      metas: metas, metasB: metasB,
+      titleFs: titleFs, titleFsB: titleFsB, emailFs: emailFs, emailFsB: emailFsB
+    };
+  }
+
+  function metaPills(metas) {
+    return metas.map(function (m) {
+      return '<div style="border:2px solid #00ACD4; color:#00ACD4; border-radius:9999px; padding:8px 24px; font-size:22px; font-weight:600;">' + esc(m) + '</div>';
+    }).join('');
+  }
+
+  function metaPillsHero(metas) {
+    return metas.map(function (m) {
+      return '<div style="border:2px solid rgba(255,255,255,0.7); border-radius:9999px; padding:7px 20px; font-size:20px; font-weight:600;">' + esc(m) + '</div>';
+    }).join('');
+  }
+
+  function respRows(items, dotSize, dotMarginTop, gap) {
+    return items.map(function (it) {
+      return '<div style="display:flex; gap:' + gap + 'em;"><div style="width:' + dotSize + 'em; height:' + dotSize + 'em; border-radius:50%; background:#00ACD4; margin-top:' + dotMarginTop + 'em; flex-shrink:0;"></div><div><strong>' + esc(it.label) + '</strong>' + esc(it.text) + '</div></div>';
+    }).join('');
+  }
+
+  function reqInline(items) {
+    return items.map(function (it) {
+      return '<div><strong>' + esc(it.label) + '</strong>' + esc(it.text) + '</div>';
+    }).join('');
+  }
+
+  function reqCards(items) {
+    return items.map(function (it) {
+      return '<div style="border:1px solid #E7E6E6; border-radius:14px; padding:0.7em 0.9em;"><strong>' + esc(it.label) + '</strong>' + esc(it.text) + '</div>';
+    }).join('');
+  }
+
+  function layoutA(v) {
+    return ''
+      + '<div style="padding:56px 72px 0 72px; display:flex; justify-content:space-between; align-items:flex-start;">'
+      +   '<div style="display:flex; flex-direction:column; gap:18px;">'
+      +     '<div style="display:inline-flex; align-self:flex-start; background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:7px 26px; font-size:19px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">' + esc(v.capsule) + '</div>'
+      +     '<div style="font-size:' + v.titleFs + 'px; font-weight:700; line-height:1.05; letter-spacing:-0.02em; color:#00ACD4; max-width:880px;">' + esc(v.title) + '</div>'
+      +   '</div>'
+      +   '<img src="assets/logo-consultora.png" alt="H&amp;A" style="width:110px; height:110px; flex-shrink:0;">'
+      + '</div>'
+      + '<div style="margin:30px 72px 0 72px; display:flex; gap:14px; flex-wrap:wrap;">' + metaPills(v.metas) + '</div>'
+      + '<div data-body style="flex:1; padding:36px 72px 0 72px; display:flex; flex-direction:column; gap:0.85em; overflow:hidden;">'
+      +   '<div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">' + esc(v.respTitle) + '</div>'
+      +   '<div style="display:flex; flex-direction:column; gap:0.62em; font-size:1em; line-height:1.34; color:#000000;">' + respRows(v.respItems, 0.46, 0.46, 0.66) + '</div>'
+      +   '<div style="height:2px; background:#E7E6E6;"></div>'
+      +   '<div style="display:flex; gap:1.8em;">'
+      +     '<div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4; padding-top:0.15em; flex-shrink:0; max-width:220px;">' + esc(v.reqTitle) + '</div>'
+      +     '<div style="display:flex; flex-direction:column; gap:0.35em; font-size:0.96em; line-height:1.34; color:#000000;">' + reqInline(v.reqItems) + '</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div style="background:#00ACD4; padding:30px 72px; display:flex; justify-content:space-between; align-items:center; margin-top:28px; gap:24px;">'
+      +   '<div style="color:#FFFFFF; font-size:25px; font-weight:600; flex-shrink:0;">Postulate enviando tu CV a</div>'
+      +   '<div style="background:#FFFFFF; color:#00ACD4; border-radius:9999px; padding:13px 34px; font-size:' + v.emailFs + 'px; font-weight:700;">' + esc(v.email) + '</div>'
+      + '</div>';
+  }
+
+  function layoutB(v) {
+    var subtitleHtml = v.hasSubtitle
+      ? '<div style="font-size:23px; font-weight:300; color:#8C837B; margin-top:10px;">' + esc(v.subtitle) + '</div>'
+      : '';
+    return ''
+      + '<div style="flex:1; display:flex; min-height:0;">'
+      +   '<div style="flex:1; padding:56px 48px 52px 64px; display:flex; flex-direction:column; min-width:0;">'
+      +     '<div style="display:inline-flex; align-self:flex-start; background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:7px 24px; font-size:18px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">' + esc(v.capsule) + '</div>'
+      +     '<div style="font-size:' + v.titleFsB + 'px; font-weight:700; line-height:1.08; letter-spacing:-0.02em; color:#00ACD4; margin-top:22px;">' + esc(v.title) + '</div>'
+      +     subtitleHtml
+      +     '<div data-body style="flex:1; margin-top:30px; display:flex; flex-direction:column; gap:0.85em; overflow:hidden;">'
+      +       '<div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">' + esc(v.respTitle) + '</div>'
+      +       '<div style="display:flex; flex-direction:column; gap:0.58em; font-size:0.94em; line-height:1.32; color:#000000;">' + respRows(v.respItems, 0.44, 0.44, 0.6) + '</div>'
+      +       '<div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4; margin-top:0.5em;">' + esc(v.reqTitle) + '</div>'
+      +       '<div style="display:flex; flex-direction:column; gap:0.35em; font-size:0.9em; line-height:1.32; color:#000000;">' + reqInline(v.reqItems) + '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div style="width:330px; flex-shrink:0; background:#00ACD4; position:relative; display:flex; flex-direction:column; padding:56px 36px; color:#FFFFFF;">'
+      +     '<div style="position:absolute; inset:0; background-image:url(\'assets/bg-olas-apiladas.png\'); background-size:cover; background-position:center; opacity:0.18;"></div>'
+      +     '<div style="position:relative; display:flex; flex-direction:column; flex:1;">'
+      +       '<img src="assets/logo-consultora-tight.png" alt="H&amp;A" style="width:92px; height:92px; border-radius:50%; border:4px solid #FFFFFF; display:block;">'
+      +       '<div style="display:flex; flex-direction:column; gap:22px; margin-top:44px;">'
+      +         v.metasB.map(function (m) {
+                  return '<div><div style="font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; opacity:0.8;">' + esc(m.label) + '</div><div style="font-size:25px; font-weight:600; margin-top:5px;">' + esc(m.value) + '</div></div>';
+                }).join('')
+      +       '</div>'
+      +       '<div style="margin-top:auto; display:flex; flex-direction:column; gap:11px;">'
+      +         '<div style="font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:0.09em;">Postulate a</div>'
+      +         '<div style="background:#FFFFFF; color:#00ACD4; border-radius:9999px; padding:12px 6px; font-size:' + v.emailFsB + 'px; font-weight:700; text-align:center;">' + esc(v.email) + '</div>'
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+  }
+
+  function layoutC(v) {
+    return ''
+      + '<div style="background:#00ACD4; position:relative; padding:48px 64px 42px 64px; color:#FFFFFF; overflow:hidden; flex-shrink:0;">'
+      +   '<div style="position:absolute; inset:0; background-image:url(\'assets/bg-olas-apiladas.png\'); background-size:cover; background-position:center bottom; opacity:0.22;"></div>'
+      +   '<div style="position:relative; display:flex; justify-content:space-between; align-items:flex-start;">'
+      +     '<div style="display:flex; flex-direction:column; gap:18px;">'
+      +       '<div style="display:inline-flex; align-self:flex-start; background:#FFFFFF; color:#00ACD4; border-radius:9999px; padding:7px 24px; font-size:18px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">' + esc(v.capsule) + '</div>'
+      +       '<div style="font-size:' + v.titleFsB + 'px; font-weight:700; line-height:1.05; letter-spacing:-0.02em; max-width:860px;">' + esc(v.title) + '</div>'
+      +       '<div style="display:flex; gap:12px; margin-top:4px; flex-wrap:wrap;">' + metaPillsHero(v.metas) + '</div>'
+      +     '</div>'
+      +     '<div style="width:100px; height:100px; border-radius:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center; flex-shrink:0;">'
+      +       '<img src="assets/logo-consultora-tight.png" alt="H&amp;A" style="width:90px; height:90px; border-radius:50%; display:block;">'
+      +     '</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div data-body style="flex:1; padding:38px 64px 0 64px; display:grid; grid-template-columns:1.45fr 1fr; gap:2em; overflow:hidden;">'
+      +   '<div>'
+      +     '<div style="font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">' + esc(v.respTitle) + '</div>'
+      +     '<div style="display:flex; flex-direction:column; gap:0.58em; font-size:0.9em; line-height:1.32; color:#000000; margin-top:0.8em;">' + respRows(v.respItems, 0.44, 0.42, 0.6) + '</div>'
+      +   '</div>'
+      +   '<div style="display:flex; flex-direction:column;">'
+      +     '<div style="font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">' + esc(v.reqTitle) + '</div>'
+      +     '<div style="display:flex; flex-direction:column; gap:0.6em; font-size:0.84em; line-height:1.34; color:#000000; margin-top:0.8em;">' + reqCards(v.reqItems) + '</div>'
+      +   '</div>'
+      + '</div>'
+      + '<div style="padding:26px 64px 34px 64px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #E7E6E6; margin-top:28px; gap:24px;">'
+      +   '<div style="display:flex; align-items:center; gap:14px; flex-shrink:0;">'
+      +     '<img src="assets/logo-consultora.png" alt="H&amp;A" style="width:58px; height:58px;">'
+      +     '<div style="font-weight:300; font-size:26px; color:#8C837B;">Hidalgo &amp; Asociados</div>'
+      +   '</div>'
+      +   '<div style="display:flex; align-items:center; gap:16px;">'
+      +     '<div style="font-size:22px; font-weight:600; color:#000000;">Postulate a</div>'
+      +     '<div style="background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:13px 30px; font-size:' + v.emailFs + 'px; font-weight:700;">' + esc(v.email) + '</div>'
+      +   '</div>'
+      + '</div>';
+  }
+
+  var exportNode = document.getElementById('export-node');
+  var scaler = document.getElementById('scaler');
+  var downloadBtn = document.getElementById('download-btn');
+
+  function renderPreview() {
+    var v = computeVals();
+    var html = state.layout === 'b' ? layoutB(v) : state.layout === 'c' ? layoutC(v) : layoutA(v);
+    exportNode.innerHTML = html;
+    var body = exportNode.querySelector('[data-body]');
+    if (body) body.style.fontSize = state.fitPx + 'px';
+    return body;
+  }
+
+  function autoFit() {
+    state.fitPx = 24;
+    var body = renderPreview();
+    var guard = 0;
+    while (body && state.fitPx > 13 && guard < 20) {
+      var over = body.scrollHeight - body.clientHeight;
+      if (over <= 2) break;
+      state.fitPx -= 1;
+      body.style.fontSize = state.fitPx + 'px';
+      guard++;
+    }
+  }
+
+  function computeScale() {
+    var availW = Math.max(300, window.innerWidth - 410 - 70);
+    var availH = Math.max(300, window.innerHeight - 80 - 70);
+    var s = Math.max(0.2, Math.min(availW / 1200, availH / 1200, 0.8));
+    state.previewScale = Math.round(s * 1000) / 1000;
+    var scaledW = Math.round(1200 * state.previewScale);
+    var scaledH = Math.round(1200 * state.previewScale);
+    scaler.style.width = scaledW + 'px';
+    scaler.style.height = scaledH + 'px';
+    exportNode.style.transform = 'scale(' + state.previewScale + ')';
+  }
+
+  function syncFormFromState() {
+    document.querySelectorAll('[data-field]').forEach(function (el) {
+      el.value = state[el.dataset.field] || '';
+    });
+  }
+
+  function setActiveTab() {
+    document.querySelectorAll('.tab').forEach(function (t) {
+      t.classList.toggle('active', t.dataset.layout === state.layout);
+    });
+  }
+
+  document.querySelectorAll('[data-field]').forEach(function (el) {
+    el.addEventListener('input', function () {
+      state[el.dataset.field] = el.value;
+      saveState();
+      autoFit();
+    });
+  });
+
+  document.querySelectorAll('.tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      state.layout = tab.dataset.layout;
+      setActiveTab();
+      saveState();
+      autoFit();
+    });
+  });
+
+  var importToggleBtn = document.getElementById('import-toggle-btn');
+  var importPanel = document.getElementById('import-panel');
+  var importTextEl = document.getElementById('import-text');
+  var importParseBtn = document.getElementById('import-parse-btn');
+  var resetBtn = document.getElementById('reset-btn');
+
+  importToggleBtn.addEventListener('click', function () {
+    state.importOpen = !state.importOpen;
+    importPanel.classList.toggle('open', state.importOpen);
+  });
+
+  importTextEl.addEventListener('input', function () {
+    state.importText = importTextEl.value;
+  });
+
+  importParseBtn.addEventListener('click', function () {
+    var upd = doImport(state.importText || '');
+    Object.assign(state, upd);
+    syncFormFromState();
+    state.importOpen = false;
+    importPanel.classList.remove('open');
+    saveState();
+    autoFit();
+  });
+
+  resetBtn.addEventListener('click', function () {
+    Object.assign(state, DEFAULTS);
+    syncFormFromState();
+    saveState();
+    autoFit();
+  });
+
+  downloadBtn.addEventListener('click', function () {
+    if (state.exporting || !window.htmlToImage) return;
+    state.exporting = true;
+    downloadBtn.textContent = 'Generando…';
+    downloadBtn.setAttribute('disabled', 'disabled');
+    window.htmlToImage.toPng(exportNode, {
+      width: 1200, height: 1200, pixelRatio: 1,
+      style: { transform: 'none' }
+    }).then(function (dataUrl) {
+      var a = document.createElement('a');
+      a.href = dataUrl;
+      var slug = (state.title || 'busqueda').toLowerCase()
+        .normalize('NFD').replace(new RegExp('[̀-ͯ]', 'g'), '')
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+      a.download = 'placa-' + (slug || 'linkedin') + '.png';
+      a.click();
+    }).catch(function (err) {
+      console.error('Export error', err);
+      alert('No se pudo generar el PNG. Revisá la consola para más detalle.');
+    }).then(function () {
+      state.exporting = false;
+      downloadBtn.textContent = 'Descargar PNG';
+      downloadBtn.removeAttribute('disabled');
+    });
+  });
+
+  window.addEventListener('resize', computeScale);
+
+  loadState();
+  syncFormFromState();
+  setActiveTab();
+  computeScale();
+  autoFit();
+})();
+</script>
+</body>
+</html>

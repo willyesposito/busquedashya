@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Búsquedas H&A — Generador de placas LinkedIn</title>
+<link rel="stylesheet" href="_ds/colors_and_type.css">
+<style>
+  body { background: #F4F7FA; font-family: 'Source Sans Pro', Arial, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 64px 24px 80px 24px; }
+  .brand { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
+  .brand img { width: 48px; height: 48px; }
+  .brand div { font-size: 13px; color: #8C837B; }
+  .brand strong { display: block; font-size: 19px; color: #1E3A5F; font-weight: 700; }
+  h1 { font-size: 32px; font-weight: 700; color: #00ACD4; line-height: 1.15; margin-bottom: 12px; }
+  .lede { font-size: 16px; color: #4A6080; line-height: 1.5; max-width: 620px; margin-bottom: 40px; }
+  .notice {
+    background: #FFF8E1; border-left: 4px solid #00ACD4; padding: 12px 16px;
+    font-size: 13px; color: #5D4037; line-height: 1.5; margin-bottom: 40px;
+  }
+  .notice strong { color: #00ACD4; }
+  .cards { display: flex; flex-direction: column; gap: 16px; }
+  .card {
+    display: block; text-decoration: none; background: #FFFFFF; border: 1px solid #DDE5EF;
+    border-radius: 14px; padding: 22px 26px; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .card:hover { border-color: #00ACD4; box-shadow: 0 4px 16px rgba(30,58,95,0.10); }
+  .card .tag {
+    display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.09em; color: #00ACD4; margin-bottom: 8px;
+  }
+  .card h2 { font-size: 18px; font-weight: 700; color: #1E3A5F; margin-bottom: 6px; }
+  .card p { font-size: 14px; color: #8C837B; line-height: 1.5; }
+  .footer-note { margin-top: 48px; font-size: 12px; color: #8FA3BA; line-height: 1.6; }
+  .footer-note a { color: #00ACD4; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">
+    <img src="assets/logo-consultora.png" alt="H&amp;A">
+    <div><strong>Hidalgo &amp; Asociados</strong>Búsquedas laborales</div>
+  </div>
+
+  <h1>Generador de placas para LinkedIn</h1>
+  <p class="lede">Herramienta interna para armar placas de búsquedas laborales (1200×1200px) respetando el sistema de marca de la consultora, y su referencia de diseño.</p>
+
+  <div class="notice"><strong>Aviso de privacidad:</strong> no cargues datos personales de candidatos, empleados o clientes en esta herramienta.</div>
+
+  <div class="cards">
+    <a class="card" href="generador-de-placas.html">
+      <div class="tag">Herramienta</div>
+      <h2>Generador de placas &rarr;</h2>
+      <p>Cargá los datos de la búsqueda (a mano o pegando el texto de la publicación), elegí uno de 3 layouts y descargá la placa lista para publicar en PNG.</p>
+    </a>
+    <a class="card" href="publicaciones-linkedin.html">
+      <div class="tag">Referencia visual</div>
+      <h2>Canvas de exploración &rarr;</h2>
+      <p>Las 3 variantes de layout aplicadas a un caso real, usadas para decidir la dirección visual antes de construir el generador.</p>
+    </a>
+    <a class="card" href="README.md">
+      <div class="tag">Documentación</div>
+      <h2>Handoff de diseño &rarr;</h2>
+      <p>Especificación completa: tokens de diseño, comportamiento, auto-fit de texto, parseo de importación y assets.</p>
+    </a>
+  </div>
+
+  <div class="footer-note">Repositorio: <a href="https://github.com/willyesposito/busquedashya">github.com/willyesposito/busquedashya</a></div>
+</div>
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/h-a-design-system-3b5ba3d0-f16b-4d39-a26f-8a6ba3e44073/colors_and_type.css">
+  <script src="_ds/h-a-design-system-3b5ba3d0-f16b-4d39-a26f-8a6ba3e44073/_ds_bundle.js"></script>
+  <script src="https://unpkg.com/html-to-image@1.11.11/dist/html-to-image.js"></script>
+</helmet>
+
+<div style="display:flex; height:100vh; overflow:hidden; background:#F4F7FA; font-family:'Source Sans Pro',Arial,sans-serif;">
+
+  <!-- ══════════ PANEL DE CARGA ══════════ -->
+  <div style="width:410px; flex-shrink:0; background:#FFFFFF; border-right:1px solid #DDE5EF; overflow-y:auto; padding:28px 26px 40px 26px; display:flex; flex-direction:column; gap:18px;">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <img src="assets/logo-consultora.png" alt="H&amp;A" style="width:44px; height:44px;">
+      <div>
+        <div style="font-size:17px; font-weight:700; color:#1E3A5F;">Generador de placas</div>
+        <div style="font-size:12px; color:#8C837B;">Búsquedas laborales · LinkedIn</div>
+      </div>
+    </div>
+
+    <div style="background:#FFF8E1; border-left:4px solid #00ACD4; padding:10px 14px; font-size:12px; color:#5D4037; line-height:1.45;">
+      <strong style="color:#00ACD4;">Aviso de privacidad:</strong> no cargues datos personales de candidatos, empleados o clientes en esta herramienta.
+    </div>
+
+    <!-- Importar -->
+    <div style="display:flex; gap:8px;">
+      <div onClick="{{onImportToggle}}" style="flex:1; text-align:center; cursor:pointer; border:2px solid #00ACD4; color:#00ACD4; border-radius:9999px; padding:8px 14px; font-size:13px; font-weight:600; letter-spacing:0.02em;">Importar desde texto</div>
+      <div onClick="{{onReset}}" style="flex:1; text-align:center; cursor:pointer; border:1px solid #DDE5EF; color:#8C837B; border-radius:9999px; padding:9px 14px; font-size:13px; font-weight:600; letter-spacing:0.02em;">Cargar ejemplo</div>
+    </div>
+
+    <sc-if value="{{importOpen}}" hint-placeholder-val="{{false}}">
+      <div style="display:flex; flex-direction:column; gap:10px; background:#F4F7FA; border:1px solid #DDE5EF; border-radius:14px; padding:14px;">
+        <div style="font-size:12px; font-weight:600; color:#1E3A5F; line-height:1.4;">Pegá el texto completo de la búsqueda y se completan los campos automáticamente. Después podés ajustar lo que haga falta.</div>
+        <textarea value="{{importText}}" onChange="{{onImportText}}" rows="9" placeholder="Pegá acá el texto de la publicación…" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif; resize:vertical; background:#FFFFFF;"></textarea>
+        <div onClick="{{onImportParse}}" style="cursor:pointer; text-align:center; background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:9px 20px; font-size:13px; font-weight:600; letter-spacing:0.02em;">Completar campos</div>
+      </div>
+    </sc-if>
+
+    <div style="height:1px; background:#DDE5EF;"></div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Cápsula superior</label>
+      <input value="{{capsule}}" onChange="{{onField}}" data-field="capsule" placeholder="Buscamos para nuestro cliente" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Título del puesto</label>
+      <input value="{{title}}" onChange="{{onField}}" data-field="title" placeholder="Analista de Recursos Humanos" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Subtítulo <span style="font-weight:400; color:#8FA3BA;">(solo layout B — opcional)</span></label>
+      <input value="{{subtitle}}" onChange="{{onField}}" data-field="subtitle" placeholder="Selección · Hidalgo &amp; Asociados" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Ubicación</label>
+        <input value="{{metaU}}" onChange="{{onField}}" data-field="metaU" placeholder="Buenos Aires" style="width:100%; padding:9px 10px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Horario</label>
+        <input value="{{metaH}}" onChange="{{onField}}" data-field="metaH" placeholder="Horario central" style="width:100%; padding:9px 10px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+      </div>
+      <div style="display:flex; flex-direction:column; gap:5px;">
+        <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Esquema</label>
+        <input value="{{metaE}}" onChange="{{onField}}" data-field="metaE" placeholder="Presencial" style="width:100%; padding:9px 10px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+      </div>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Título de la primera sección</label>
+      <input value="{{respTitle}}" onChange="{{onField}}" data-field="respTitle" placeholder="Principales responsabilidades" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Responsabilidades <span style="font-weight:400; color:#8FA3BA;">(una por línea — "Etiqueta: detalle" pone la etiqueta en negrita)</span></label>
+      <textarea value="{{respText}}" onChange="{{onField}}" data-field="respText" rows="8" placeholder="Administración de personal: supervisar novedades y legajos.&#10;Cultura y organización: iniciativas de clima laboral." style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif; resize:vertical; line-height:1.5;"></textarea>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Título de la segunda sección</label>
+      <input value="{{reqTitle}}" onChange="{{onField}}" data-field="reqTitle" placeholder="Requisitos" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Requisitos <span style="font-weight:400; color:#8FA3BA;">(uno por línea, mismo formato)</span></label>
+      <textarea value="{{reqText}}" onChange="{{onField}}" data-field="reqText" rows="5" placeholder="Formación: graduados de RRHH o afines&#10;Idioma: Inglés Upper Intermediate" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif; resize:vertical; line-height:1.5;"></textarea>
+    </div>
+
+    <div style="display:flex; flex-direction:column; gap:5px;">
+      <label style="font-size:12px; font-weight:600; color:#1E3A5F;">Email de postulación</label>
+      <input value="{{email}}" onChange="{{onField}}" data-field="email" placeholder="ha5272@bhidalgo.com.ar" style="width:100%; padding:9px 12px; border:1px solid #DDE5EF; border-radius:8px; font-size:13px; color:#1E3A5F; font-family:'Source Sans Pro',Arial,sans-serif;">
+    </div>
+  </div>
+
+  <!-- ══════════ VISTA PREVIA ══════════ -->
+  <div style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+    <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 28px; border-bottom:1px solid #DDE5EF; background:#FFFFFF;">
+      <div style="display:flex; gap:8px; align-items:center;">
+        <div style="font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4; margin-right:8px;">Layout</div>
+        <div onClick="{{onLayout}}" data-layout="a" style="{{tabAStyle}}">A · Clásica</div>
+        <div onClick="{{onLayout}}" data-layout="b" style="{{tabBStyle}}">B · Panel lateral</div>
+        <div onClick="{{onLayout}}" data-layout="c" style="{{tabCStyle}}">C · Hero celeste</div>
+      </div>
+      <div onClick="{{onDownload}}" style="cursor:pointer; background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:10px 26px; font-size:14px; font-weight:600; letter-spacing:0.02em;">{{downloadLabel}}</div>
+    </div>
+
+    <div style="flex:1; overflow:auto; display:flex; align-items:flex-start; justify-content:center; padding:32px;">
+      <div style="width:{{scaledW}}px; height:{{scaledH}}px; flex-shrink:0;">
+        <div ref="{{exportRef}}" data-screen-label="Placa" style="width:1200px; height:1200px; transform:scale({{previewScale}}); transform-origin:top left; background:#FFFFFF; overflow:hidden; font-family:'Source Sans Pro',Arial,sans-serif; box-shadow:0 12px 40px rgba(30,58,95,0.15); display:flex; flex-direction:column;">
+
+          <!-- ── LAYOUT A — Clásica blanca ── -->
+          <sc-if value="{{isA}}" hint-placeholder-val="{{true}}">
+            <div style="padding:56px 72px 0 72px; display:flex; justify-content:space-between; align-items:flex-start;">
+              <div style="display:flex; flex-direction:column; gap:18px;">
+                <div style="display:inline-flex; align-self:flex-start; background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:7px 26px; font-size:19px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">{{capsule}}</div>
+                <div style="font-size:{{titleFs}}px; font-weight:700; line-height:1.05; letter-spacing:-0.02em; color:#00ACD4; max-width:880px;">{{title}}</div>
+              </div>
+              <img src="assets/logo-consultora.png" alt="H&amp;A" style="width:110px; height:110px; flex-shrink:0;">
+            </div>
+            <div style="margin:30px 72px 0 72px; display:flex; gap:14px; flex-wrap:wrap;">
+              <sc-for list="{{metas}}" as="m" hint-placeholder-count="3">
+                <div style="border:2px solid #00ACD4; color:#00ACD4; border-radius:9999px; padding:8px 24px; font-size:22px; font-weight:600;">{{m}}</div>
+              </sc-for>
+            </div>
+            <div ref="{{bodyRef}}" style="flex:1; padding:36px 72px 0 72px; display:flex; flex-direction:column; gap:0.85em; font-size:{{fitPx}}px; overflow:hidden;">
+              <div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">{{respTitle}}</div>
+              <div style="display:flex; flex-direction:column; gap:0.62em; font-size:1em; line-height:1.34; color:#000000;">
+                <sc-for list="{{respItems}}" as="it" hint-placeholder-count="4">
+                  <div style="display:flex; gap:0.66em;"><div style="width:0.46em; height:0.46em; border-radius:50%; background:#00ACD4; margin-top:0.46em; flex-shrink:0;"></div><div><strong>{{it.label}}</strong>{{it.text}}</div></div>
+                </sc-for>
+              </div>
+              <div style="height:2px; background:#E7E6E6;"></div>
+              <div style="display:flex; gap:1.8em;">
+                <div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4; padding-top:0.15em; flex-shrink:0; max-width:220px;">{{reqTitle}}</div>
+                <div style="display:flex; flex-direction:column; gap:0.35em; font-size:0.96em; line-height:1.34; color:#000000;">
+                  <sc-for list="{{reqItems}}" as="it" hint-placeholder-count="3">
+                    <div><strong>{{it.label}}</strong>{{it.text}}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="background:#00ACD4; padding:30px 72px; display:flex; justify-content:space-between; align-items:center; margin-top:28px; gap:24px;">
+              <div style="color:#FFFFFF; font-size:25px; font-weight:600; flex-shrink:0;">Postulate enviando tu CV a</div>
+              <div style="background:#FFFFFF; color:#00ACD4; border-radius:9999px; padding:13px 34px; font-size:{{emailFs}}px; font-weight:700;">{{email}}</div>
+            </div>
+          </sc-if>
+
+          <!-- ── LAYOUT B — Panel lateral celeste ── -->
+          <sc-if value="{{isB}}" hint-placeholder-val="{{false}}">
+            <div style="flex:1; display:flex; min-height:0;">
+              <div style="flex:1; padding:56px 48px 52px 64px; display:flex; flex-direction:column; min-width:0;">
+                <div style="display:inline-flex; align-self:flex-start; background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:7px 24px; font-size:18px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">{{capsule}}</div>
+                <div style="font-size:{{titleFsB}}px; font-weight:700; line-height:1.08; letter-spacing:-0.02em; color:#00ACD4; margin-top:22px;">{{title}}</div>
+                <sc-if value="{{hasSubtitle}}" hint-placeholder-val="{{true}}">
+                  <div style="font-size:23px; font-weight:300; color:#8C837B; margin-top:10px;">{{subtitle}}</div>
+                </sc-if>
+                <div ref="{{bodyRef}}" style="flex:1; margin-top:30px; display:flex; flex-direction:column; gap:0.85em; font-size:{{fitPx}}px; overflow:hidden;">
+                  <div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">{{respTitle}}</div>
+                  <div style="display:flex; flex-direction:column; gap:0.58em; font-size:0.94em; line-height:1.32; color:#000000;">
+                    <sc-for list="{{respItems}}" as="it" hint-placeholder-count="4">
+                      <div style="display:flex; gap:0.6em;"><div style="width:0.44em; height:0.44em; border-radius:50%; background:#00ACD4; margin-top:0.44em; flex-shrink:0;"></div><div><strong>{{it.label}}</strong>{{it.text}}</div></div>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:0.84em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4; margin-top:0.5em;">{{reqTitle}}</div>
+                  <div style="display:flex; flex-direction:column; gap:0.35em; font-size:0.9em; line-height:1.32; color:#000000;">
+                    <sc-for list="{{reqItems}}" as="it" hint-placeholder-count="3">
+                      <div><strong>{{it.label}}</strong>{{it.text}}</div>
+                    </sc-for>
+                  </div>
+                </div>
+              </div>
+              <div style="width:330px; flex-shrink:0; background:#00ACD4; position:relative; display:flex; flex-direction:column; padding:56px 36px; color:#FFFFFF;">
+                <div style="position:absolute; inset:0; background-image:url('assets/bg-olas-apiladas.png'); background-size:cover; background-position:center; opacity:0.18;"></div>
+                <div style="position:relative; display:flex; flex-direction:column; flex:1;">
+                  <img src="assets/logo-consultora-tight.png" alt="H&amp;A" style="width:92px; height:92px; border-radius:50%; border:4px solid #FFFFFF; display:block;">
+                  <div style="display:flex; flex-direction:column; gap:22px; margin-top:44px;">
+                    <sc-for list="{{metasB}}" as="m" hint-placeholder-count="3">
+                      <div><div style="font-size:16px; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; opacity:0.8;">{{m.label}}</div><div style="font-size:25px; font-weight:600; margin-top:5px;">{{m.value}}</div></div>
+                    </sc-for>
+                  </div>
+                  <div style="margin-top:auto; display:flex; flex-direction:column; gap:11px;">
+                    <div style="font-size:18px; font-weight:700; text-transform:uppercase; letter-spacing:0.09em;">Postulate a</div>
+                    <div style="background:#FFFFFF; color:#00ACD4; border-radius:9999px; padding:12px 6px; font-size:{{emailFsB}}px; font-weight:700; text-align:center;">{{email}}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- ── LAYOUT C — Hero celeste ── -->
+          <sc-if value="{{isC}}" hint-placeholder-val="{{false}}">
+            <div style="background:#00ACD4; position:relative; padding:48px 64px 42px 64px; color:#FFFFFF; overflow:hidden; flex-shrink:0;">
+              <div style="position:absolute; inset:0; background-image:url('assets/bg-olas-apiladas.png'); background-size:cover; background-position:center bottom; opacity:0.22;"></div>
+              <div style="position:relative; display:flex; justify-content:space-between; align-items:flex-start;">
+                <div style="display:flex; flex-direction:column; gap:18px;">
+                  <div style="display:inline-flex; align-self:flex-start; background:#FFFFFF; color:#00ACD4; border-radius:9999px; padding:7px 24px; font-size:18px; font-weight:700; letter-spacing:0.05em; text-transform:uppercase;">{{capsule}}</div>
+                  <div style="font-size:{{titleFsB}}px; font-weight:700; line-height:1.05; letter-spacing:-0.02em; max-width:860px;">{{title}}</div>
+                  <div style="display:flex; gap:12px; margin-top:4px; flex-wrap:wrap;">
+                    <sc-for list="{{metas}}" as="m" hint-placeholder-count="3">
+                      <div style="border:2px solid rgba(255,255,255,0.7); border-radius:9999px; padding:7px 20px; font-size:20px; font-weight:600;">{{m}}</div>
+                    </sc-for>
+                  </div>
+                </div>
+                <div style="width:100px; height:100px; border-radius:50%; background:#FFFFFF; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                  <img src="assets/logo-consultora-tight.png" alt="H&amp;A" style="width:90px; height:90px; border-radius:50%; display:block;">
+                </div>
+              </div>
+            </div>
+            <div ref="{{bodyRef}}" style="flex:1; padding:38px 64px 0 64px; display:grid; grid-template-columns:1.45fr 1fr; gap:2em; font-size:{{fitPx}}px; overflow:hidden;">
+              <div>
+                <div style="font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">{{respTitle}}</div>
+                <div style="display:flex; flex-direction:column; gap:0.58em; font-size:0.9em; line-height:1.32; color:#000000; margin-top:0.8em;">
+                  <sc-for list="{{respItems}}" as="it" hint-placeholder-count="4">
+                    <div style="display:flex; gap:0.6em;"><div style="width:0.44em; height:0.44em; border-radius:50%; background:#00ACD4; margin-top:0.42em; flex-shrink:0;"></div><div><strong>{{it.label}}</strong>{{it.text}}</div></div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column;">
+                <div style="font-size:0.8em; font-weight:700; text-transform:uppercase; letter-spacing:0.09em; color:#00ACD4;">{{reqTitle}}</div>
+                <div style="display:flex; flex-direction:column; gap:0.6em; font-size:0.84em; line-height:1.34; color:#000000; margin-top:0.8em;">
+                  <sc-for list="{{reqItems}}" as="it" hint-placeholder-count="3">
+                    <div style="border:1px solid #E7E6E6; border-radius:14px; padding:0.7em 0.9em;"><strong>{{it.label}}</strong>{{it.text}}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+            <div style="padding:26px 64px 34px 64px; display:flex; justify-content:space-between; align-items:center; border-top:1px solid #E7E6E6; margin-top:28px; gap:24px;">
+              <div style="display:flex; align-items:center; gap:14px; flex-shrink:0;">
+                <img src="assets/logo-consultora.png" alt="H&amp;A" style="width:58px; height:58px;">
+                <div style="font-weight:300; font-size:26px; color:#8C837B;">Hidalgo &amp; Asociados</div>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <div style="font-size:22px; font-weight:600; color:#000000;">Postulate a</div>
+                <div style="background:#00ACD4; color:#FFFFFF; border-radius:9999px; padding:13px 30px; font-size:{{emailFs}}px; font-weight:700;">{{email}}</div>
+              </div>
+            </div>
+          </sc-if>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const DEFAULTS = {
+  layout: 'a',
+  capsule: 'Buscamos para nuestro cliente',
+  title: 'Analista de Recursos Humanos',
+  subtitle: 'Selección · Hidalgo & Asociados',
+  metaU: 'Buenos Aires',
+  metaH: 'Horario central',
+  metaE: 'Esquema presencial',
+  respTitle: 'Principales responsabilidades',
+  respText: [
+    'Administración de personal: supervisar el cumplimiento de novedades, control de legajos y procesos administrativos de ingreso/egreso.',
+    'Tareas generalistas: brindar soporte al área en general y atención como perfil generalista a determinadas unidades de negocio.',
+    'Cultura y organización: participar en el diseño de iniciativas que fortalezcan el clima laboral y la alineación con los valores organizacionales.',
+    'Marca empleadora: ejecutar acciones para potenciar el posicionamiento de la compañía en el mercado de talento y redes profesionales.',
+    'Gestión del talento: soporte en procesos de capacitación, desempeño y comunicación interna.'
+  ].join('\n'),
+  reqTitle: 'Requisitos',
+  reqText: [
+    'Formación: graduados o próximos a graduarse de Recursos Humanos, Relaciones del Trabajo, Psicología o carreras afines',
+    'Idioma: Inglés Upper Intermediate',
+    'Experiencia: mínima de 2 a 3 años en posiciones similares'
+  ].join('\n'),
+  email: 'ha5272@bhidalgo.com.ar'
+};
+
+const LS_KEY = 'hya-generador-placas';
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.bodyRef = React.createRef();
+    this.exportRef = React.createRef();
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch (e) {}
+    this.state = Object.assign({}, DEFAULTS, saved || {}, {
+      fitPx: 24,
+      previewScale: 0.5,
+      importOpen: false,
+      importText: '',
+      exporting: false
+    });
+  }
+
+  componentDidMount() {
+    this.computeScale();
+    this._onResize = () => this.computeScale();
+    window.addEventListener('resize', this._onResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+  }
+
+  computeScale() {
+    const availW = Math.max(300, window.innerWidth - 410 - 70);
+    const availH = Math.max(300, window.innerHeight - 80 - 70);
+    const s = Math.max(0.2, Math.min(availW / 1200, availH / 1200, 0.8));
+    this.setState({ previewScale: Math.round(s * 1000) / 1000 });
+  }
+
+  componentDidUpdate() {
+    try {
+      const keep = {};
+      ['layout','capsule','title','subtitle','metaU','metaH','metaE','respTitle','respText','reqTitle','reqText','email'].forEach(k => { keep[k] = this.state[k]; });
+      localStorage.setItem(LS_KEY, JSON.stringify(keep));
+    } catch (e) {}
+    const el = this.bodyRef.current;
+    if (el && this.state.fitPx > 13) {
+      const over = el.scrollHeight - el.clientHeight;
+      if (over > 2) this.setState(s => ({ fitPx: s.fitPx - 1 }));
+    }
+  }
+
+  parseItems(txt) {
+    return (txt || '').split('\n').map(l => l.trim()).filter(Boolean).map(l => {
+      const i = l.indexOf(':');
+      if (i > 0 && i < 60) return { label: l.slice(0, i + 1) + ' ', text: l.slice(i + 1).trim() };
+      return { label: '', text: l };
+    });
+  }
+
+  doImport(text) {
+    const upd = {};
+    const emailMatch = text.match(/[\w.+-]+@[\w.-]+\.\w+/);
+    if (emailMatch) upd.email = emailMatch[0];
+
+    const lines = text.split(/\n/)
+      .map(l => l.replace(/^[\s•\-–—▪✅☑️🔹🚀📍*·]+/, '').trim())
+      .filter(Boolean);
+    if (!lines.length) return upd;
+
+    const isHeader = (l, re) => re.test(l) && l.replace(/[^A-Za-zÁÉÍÓÚáéíóúñÑüÜ ¿?]/g, '').length < 45;
+    const idxResp = lines.findIndex(l => isHeader(l, /respons|tareas|¿?cu[aá]les ser[aá]n/i));
+    const idxReq = lines.findIndex(l => isHeader(l, /requisit|valoramos|buscamos en vos|perfil buscado/i));
+    const idxDatos = lines.findIndex(l => isHeader(l, /datos de inter|inter[eé]s|informaci[oó]n/i));
+
+    // Título: primera línea que no sea header ni contacto
+    const first = lines.find(l => !/postulate|cv|@/i.test(l));
+    if (first) {
+      upd.title = first.replace(/^b[uú]squeda laboral:?\s*/i, '').replace(/^b[uú]squeda:?\s*/i, '').trim();
+    }
+
+    // Metas
+    lines.forEach(l => {
+      const val = l.includes(':') ? l.split(':').slice(1).join(':').trim() : l;
+      if (/ubicaci[oó]n|microcentro|zona/i.test(l) && !upd.metaU) upd.metaU = val || l;
+      else if (/horario|lunes a viernes/i.test(l) && !upd.metaH) upd.metaH = l.replace(/^.*horario:?\s*/i, '') || val;
+      else if (/esquema|h[ií]brido|remoto|presencial/i.test(l) && !upd.metaE) upd.metaE = val || l;
+    });
+
+    const sectionEnd = (start) => {
+      const ends = [idxResp, idxReq, idxDatos].filter(i => i > start);
+      return ends.length ? Math.min.apply(null, ends) : lines.length;
+    };
+    const cleanBody = (arr) => arr.filter(l =>
+      !/postulate|enviando tu cv|@/i.test(l) &&
+      !/^ubicaci[oó]n|^horario|^esquema/i.test(l)
+    );
+
+    if (idxResp >= 0) {
+      upd.respText = cleanBody(lines.slice(idxResp + 1, sectionEnd(idxResp))).join('\n');
+      const h = lines[idxResp].replace(/[:¿?]/g, '').trim();
+      if (h) upd.respTitle = h;
+    }
+    if (idxReq >= 0) {
+      upd.reqText = cleanBody(lines.slice(idxReq + 1, sectionEnd(idxReq))).join('\n');
+      const h = lines[idxReq].replace(/[:¿?]/g, '').trim();
+      if (h) upd.reqTitle = h;
+    }
+    return upd;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const title = s.title || 'Título del puesto';
+    const len = title.length;
+    const titleFs = len <= 22 ? 66 : len <= 34 ? 56 : len <= 48 ? 48 : 40;
+    const titleFsB = len <= 26 ? 56 : len <= 40 ? 47 : len <= 56 ? 40 : 34;
+    const email = s.email || 'email@bhidalgo.com.ar';
+    const emailFs = email.length > 28 ? 21 : email.length > 23 ? 24 : 27;
+    const emailFsB = email.length > 24 ? 16 : 20;
+
+    const metas = [s.metaU, s.metaH, s.metaE].map(m => (m || '').trim()).filter(Boolean);
+    const metaLabels = ['Ubicación', 'Horario', 'Esquema'];
+    const metasB = [s.metaU, s.metaH, s.metaE]
+      .map((v, i) => ({ label: metaLabels[i], value: (v || '').trim() }))
+      .filter(m => m.value);
+
+    const tab = (active) => ({
+      cursor: 'pointer', borderRadius: 9999, padding: '8px 18px',
+      fontSize: 13, fontWeight: 600, letterSpacing: '0.02em',
+      background: active ? '#00ACD4' : 'transparent',
+      color: active ? '#FFFFFF' : '#8C837B',
+      border: active ? '2px solid #00ACD4' : '2px solid #DDE5EF',
+      transition: 'all 0.22s cubic-bezier(.4,0,.2,1)'
+    });
+
+    return {
+      capsule: s.capsule || 'Búsqueda laboral',
+      title, subtitle: s.subtitle,
+      hasSubtitle: !!(s.subtitle && s.subtitle.trim()),
+      metaU: s.metaU, metaH: s.metaH, metaE: s.metaE,
+      respTitle: s.respTitle || 'Responsabilidades',
+      reqTitle: s.reqTitle || 'Requisitos',
+      respText: s.respText, reqText: s.reqText,
+      email,
+      respItems: this.parseItems(s.respText),
+      reqItems: this.parseItems(s.reqText),
+      metas, metasB,
+      titleFs, titleFsB, emailFs, emailFsB,
+      fitPx: s.fitPx,
+      isA: s.layout === 'a', isB: s.layout === 'b', isC: s.layout === 'c',
+      tabAStyle: tab(s.layout === 'a'),
+      tabBStyle: tab(s.layout === 'b'),
+      tabCStyle: tab(s.layout === 'c'),
+      previewScale: s.previewScale,
+      scaledW: Math.round(1200 * s.previewScale),
+      scaledH: Math.round(1200 * s.previewScale),
+      importOpen: s.importOpen,
+      importText: s.importText,
+      downloadLabel: s.exporting ? 'Generando…' : 'Descargar PNG',
+      bodyRef: this.bodyRef,
+      exportRef: this.exportRef,
+
+      onField: (e) => {
+        const f = e.target.dataset.field;
+        this.setState({ [f]: e.target.value, fitPx: 24 });
+      },
+      onLayout: (e) => {
+        this.setState({ layout: e.currentTarget.dataset.layout, fitPx: 24 });
+      },
+      onImportToggle: () => this.setState(st => ({ importOpen: !st.importOpen })),
+      onImportText: (e) => this.setState({ importText: e.target.value }),
+      onImportParse: () => {
+        const upd = this.doImport(this.state.importText || '');
+        this.setState(Object.assign({ importOpen: false, fitPx: 24 }, upd));
+      },
+      onReset: () => this.setState(Object.assign({}, DEFAULTS, { fitPx: 24 })),
+      onDownload: async () => {
+        const node = this.exportRef.current;
+        if (!node || !window.htmlToImage || this.state.exporting) return;
+        this.setState({ exporting: true });
+        try {
+          const dataUrl = await window.htmlToImage.toPng(node, {
+            width: 1200, height: 1200, pixelRatio: 1,
+            style: { transform: 'none' }
+          });
+          const a = document.createElement('a');
+          a.href = dataUrl;
+          const slug = (this.state.title || 'busqueda').toLowerCase()
+            .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+          a.download = 'placa-' + (slug || 'linkedin') + '.png';
+          a.click();
+        } catch (err) { console.error('Export error', err); }
+        this.setState({ exporting: false });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>
